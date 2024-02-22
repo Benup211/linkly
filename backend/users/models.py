@@ -5,7 +5,9 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import BaseUserManager
+from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
 
 class CustomUserManager(BaseUserManager):
     def _create_user(self, email, password, **extra_fields):
@@ -44,12 +46,21 @@ class customUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     objects = CustomUserManager()
+    def validate_password(self, password):
+        try:
+            validate_password(password, self)
+        except ValidationError as error:
+            raise ValueError(str(error))
+
+    def set_password(self, raw_password):
+        self.validate_password(raw_password)
+        super().set_password(raw_password)
 
 @receiver(post_save, sender=customUser)
 def send_activation_email(sender, instance, created, **kwargs):
     if created:
         subject = 'Activate your account'
-        message = 'Please click the following link to activate your account: {}/activate/{}'.format(
+        message = 'Please click the following link to activate your account: {}/users/activate/{}'.format(
             settings.BASE_URL, instance.id
         )
         print(subject,message)
