@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'links',
     'api',
     'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -138,3 +139,9 @@ AUTHENTICATION_BACKENDS = [
 
 #custom user
 AUTH_USER_MODEL = 'users.customUser'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
