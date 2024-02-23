@@ -47,8 +47,13 @@ class LoginSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         user = validated_data['user']
+        try:
+            token = Token.objects.get(user=user)
+            token.delete()
+        except Token.DoesNotExist:
+            pass
         token, _ = Token.objects.get_or_create(user=user)
-        return {'token': token.key}
+        return {'token': token.key,'id':user.id}
     
 class LinkSerializer(serializers.ModelSerializer):
     class Meta:

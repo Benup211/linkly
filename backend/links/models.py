@@ -15,7 +15,7 @@ class Link(models.Model):
     original_url = models.URLField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     hits = models.PositiveIntegerField(default=0)
-    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    user = models.ManyToManyField(User,blank=True)
 
     def save(self, *args, **kwargs):
         if not self.short_code:
