@@ -5,6 +5,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from links.models import Link
+from django.conf import settings
 
 User = get_user_model()
 
@@ -59,3 +60,17 @@ class LinkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Link
         fields = ['original_url','user']
+class UserLinkSerializer(serializers.ModelSerializer):
+    short_code = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Link
+        fields = ['short_code', 'original_url', 'created_at', 'hits']
+
+    def get_short_code(self, obj):
+        return settings.BASE_URL + '/' + obj.short_code
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['short_code'] = self.get_short_code(instance)
+        return representation

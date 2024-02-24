@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from links.models import Link
-from .serializers import LinkSerializer
+from .serializers import LinkSerializer,UserLinkSerializer
 import json
 from users.models import customUser
 from django.conf import settings
@@ -32,6 +32,12 @@ def create_short_link(request):
             link = serializer.save()
             return Response({'short_code': settings.BASE_URL+"/"+link.short_code}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['POST'])
+def getUserLinks(request):
+    link=Link.objects.filter(user=request.data['user'])
+    serializer=UserLinkSerializer(link,many=True)
+    return Response(serializer.data)
 
 def redirect_to_original_url(request, short_code):
     link = Link.objects.get(short_code=short_code)

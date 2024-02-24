@@ -13,7 +13,7 @@ def generate_short_code():
 class Link(models.Model):
     short_code = models.CharField(max_length=8, unique=True, primary_key=True, editable=False)
     original_url = models.URLField(unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateField(auto_now_add=True)
     hits = models.PositiveIntegerField(default=0)
     user = models.ManyToManyField(User,blank=True)
 
